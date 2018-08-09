@@ -1,3 +1,5 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Node template
 # Logs
 logs
 *.log
@@ -36,7 +38,7 @@ build/Release
 node_modules/
 jspm_packages/
 
-# TypeScript v1 declaration files
+# Typescript v1 declaration files
 typings/
 
 # Optional npm cache directory
@@ -59,3 +61,9 @@ typings/
 
 # next.js build output
 .next
+
+/.idea/
+/src/app/css/main.css
+/src/app/css/main.css.map
+/src/app/js/client.js
+/src/app/js/client.js.map
