@@ -22,61 +22,70 @@ server.listen(9080, () => {
 });
 const cacheUser = {};
 router.get('/stats', function (req, res) {
-    fs.readdir('../stats/', (err, files) => {
-        const data = [];
-        if (err) {
-            res.status(200).json({user: []});
-            return;
-        }
-        for (let i = 0; i < files.length; i++) {
-            const withoutExt = files[i].replace('.json', '');
-            const userUUID = withoutExt.replace(/[-]/g, '');
-            if (cacheUser[userUUID]) {
-                fs.readFile('../stats/' + files[i], 'utf-8', function (err, content) {
-                    const userSave = cacheUser[userUUID];
-                    let stats = {};
-                    if (!err) {
-                        stats = JSON.parse(content);
-                        userSave.stats = stats;
-                    }
-                    data.push(userSave);
-                    if (i === files.length - 1) {
-                        res.status(200).json(data);
-                    }
-                });
-            } else {
-                fetch(`https://api.mojang.com/user/profiles/${userUUID}/names`).then(res => res.json()).then(json => {
+    try {
+        fs.readdir('../stats/', (err, files) => {
+            const data = [];
+            if (err) {
+                res.status(200).json({user: []});
+                return;
+            }
+            for (let i = 0; i < files.length; i++) {
+                const withoutExt = files[i].replace('.json', '');
+                const userUUID = withoutExt.replace(/[-]/g, '');
+                if (cacheUser[userUUID]) {
                     fs.readFile('../stats/' + files[i], 'utf-8', function (err, content) {
+                        const userSave = cacheUser[userUUID];
                         let stats = {};
                         if (!err) {
                             stats = JSON.parse(content);
+                            userSave.stats = stats;
                         }
-                        let user = {
-                            pseudos: json,
-                            uuid: withoutExt,
-                            stats
-                        };
-                        data.push(user);
-                        cacheUser[userUUID] = user;
+                        data.push(userSave);
                         if (i === files.length - 1) {
                             res.status(200).json(data);
                         }
                     });
-                });
+                } else {
+                    fetch(`https://api.mojang.com/user/profiles/${userUUID}/names`).then(res => res.json()).then(json => {
+                        fs.readFile('../stats/' + files[i], 'utf-8', function (err, content) {
+                            let stats = {};
+                            if (!err) {
+                                stats = JSON.parse(content);
+                            }
+                            let user = {
+                                pseudos: json,
+                                uuid: withoutExt,
+                                stats
+                            };
+                            data.push(user);
+                            cacheUser[userUUID] = user;
+                            if (i === files.length - 1) {
+                                res.status(200).json(data);
+                            }
+                        });
+                    });
+                }
             }
-        }
-    });
+        });
+    } catch (e) {
+        res.status(404).json({});
+    }
+
 });
 
 router.get('/stats/:user', function (req, res) {
-    const params = req.params || {};
-    const user = params.user.replace(/[\/.\\]/g, '');
-    fs.readFile('../stats/' + user + '.json', 'utf-8', function (err, content) {
-        if (err) {
-            res.status(404).json({});
-            return;
-        }
+    try {
+        const params = req.params || {};
+        const user = params.user.replace(/[\/.\\]/g, '');
+        fs.readFile('../stats/' + user + '.json', 'utf-8', function (err, content) {
+            if (err) {
+                res.status(404).json({});
+                return;
+            }
 
-        res.status(200).json(JSON.parse(content));
-    });
+            res.status(200).json(JSON.parse(content));
+        });
+    } catch (e) {
+        res.status(404).json({});
+    }
 });

@@ -20,7 +20,7 @@ window.loadUsers = () => {
                     <figure onclick="openModal('${user.uuid}','${lastPseudo}')" class="card btn shadow-sm m-2 p-1">
                         <figcaption class="card-body">
                             ${lastPseudo}
-                        </figcaption>
+                        </figcaption>say 
                     </figure>
                 `);
                 $('#usersList').append($figure);
