@@ -24,7 +24,9 @@ module.exports = {
         rules: [
             {
                 test: /\.html$/,
-                use: ['html-loader'],
+                use: {
+                    loader: "html-loader",
+                },
                 exclude: path.resolve(__dirname, 'src/index.html')
             }, {
                 test: /\.(jpg|png|svg)$/,
